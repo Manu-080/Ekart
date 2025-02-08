@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Store',
+    'Accounts',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +70,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'E_kart.wsgi.application'
+
+AUTH_USER_MODEL = 'Accounts.Account'
 
 
 # Database
