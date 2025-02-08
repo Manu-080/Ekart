@@ -1,74 +1,57 @@
 {% load static %}
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock title %}</title>
-    <link rel="stylesheet" href="{%static 'css/style.css'%}">
+<meta charset="utf-8">
+<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="max-age=604800" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>{% block title %}{% endblock title %}</title>
+
+<link href="{% static 'images/favicon.ico'%}" rel="shortcut icon" type="image/x-icon">
+
+<!-- jQuery -->
+<script src="{% static 'js/jquery-2.0.0.min.js' %}" type="text/javascript"></script>
+
+<!-- Bootstrap4 files-->
+<script src="{% static "js/bootstrap.bundle.min.js" %}" type="text/javascript"></script>
+<link href="{% static "css/bootstrap.css" %}" rel="stylesheet" type="text/css"/>
+
+<!-- Font awesome 5 -->
+<link href="{% static "fonts/fontawesome/css/all.min.css" %}" type="text/css" rel="stylesheet">
+
+<!-- custom style -->
+<link href="{% static "css/ui.css" %}" rel="stylesheet" type="text/css"/>
+<link href="{% static "css/responsive.css" %}" rel="stylesheet" media="only screen and (max-width: 1200px)" />
+
+<!-- custom javascript -->
+<script src="{% static "js/script.js" %}" type="text/javascript"></script>
+
+<script type="text/javascript">
+/// some script
+
+// jquery ready start
+$(document).ready(function() {
+	// jQuery code
+
+}); 
+// jquery end
+</script>
+
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo">ShopEase</div>
-            <form class="search-form">
-                <input type="text" placeholder="Search...">
-            </form>
-            <div class="nav-links">
-                <a href="#home">Home</a>
-                <div class="dropdown">
-                    <a href="#categories" class="dropbtn">Categories</a>
-                    <div class="dropdown-content">
-                        <a href="#electronics">Electronics</a>
-                        <a href="#fashion">Fashion</a>
-                        <a href="#home-appliances">Home Appliances</a>
-                        <a href="#books">Books</a>
-                        <a href="#toys">Toys</a>
-                    </div>
-                </div>
-                <a href="#products">Products</a>
-                <a href="#about">About</a>
-                <a href="#contact">Contact</a>
-            </div>
-        </nav>
-    </header>
-    {% block content %}
-    
-    
-    {% endblock content %}
 
 
+{% include "basic_include/navbar.html" %}
+
+{% block content %}
 
 
+{% endblock content %}
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>About Us</h3>
-                <ul>
-                    <li><a href="#story">Our Story</a></li>
-                    <li><a href="#careers">Careers</a></li>
-                    <li><a href="#press">Press</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Customer Service</h3>
-                <ul>
-                    <li><a href="#contact">Contact Us</a></li>
-                    <li><a href="#shipping">Shipping Info</a></li>
-                    <li><a href="#returns">Returns & Exchanges</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Connect With Us</h3>
-                <ul>
-                    <li><a href="#facebook">Facebook</a></li>
-                    <li><a href="#instagram">Instagram</a></li>
-                    <li><a href="#twitter">Twitter</a></li>
-                </ul>
-            </div>
-        </div>
-    </footer>
+
+{% include "basic_include/footer.html" %}
+
 </body>
 </html>

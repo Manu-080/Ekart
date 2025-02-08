@@ -35,10 +35,11 @@ class MyAccountManager(BaseUserManager):
         user.is_staff = True
         user.is_active = True
         user.is_superadmin = True
-        
+
         user.save(using=self._db)
         return user
 
+# Account model
 class Account(AbstractBaseUser):
     first_name = models.CharField(max_length=50, verbose_name="First name")
     last_name = models.CharField(max_length=50, verbose_name="Last name")
