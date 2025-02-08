@@ -7,7 +7,7 @@ class Category(models.Model):
     category_name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
 
-    class meta:
+    class Meta:
         verbose_name = "category"
         verbose_name_plural = "categories"
 
