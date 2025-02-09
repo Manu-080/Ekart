@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 # Create your models here.
 
@@ -11,6 +12,9 @@ class Category(models.Model):
         verbose_name = "category"
         verbose_name_plural = "categories"
 
+    def get_url(self):
+        return reverse('products_by_category', args=[self.slug])
+
     def __str__(self):
         return self.category_name
     
@@ -19,7 +23,7 @@ class Category(models.Model):
 class Product(models.Model):
     product_name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
-    price = models.DecimalField(default=0, decimal_places=2, max_digits=6)
+    price = models.DecimalField(default=0, decimal_places=2, max_digits=8)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
     description = models.CharField(max_length=500, default='', blank=True, null=True)
     image = models.ImageField(upload_to="uploads/product/")
@@ -28,6 +32,10 @@ class Product(models.Model):
     is_available = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
+
+    def get_url(self):
+        return reverse("product_detail", args=[self.category.slug, self.slug])
+    
 
     def __str__(self):
         return self.product_name
