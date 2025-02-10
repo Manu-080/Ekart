@@ -23,5 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('Store.urls')), # This line includes the urls.py file from Store app
     path('', include('Accounts.urls')), # This line includes the urls.py file from Accounts app
+    path('', include('Cart.urls')), # This line includes the urls.py file from Cart app
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # This line is used to serve media files during development

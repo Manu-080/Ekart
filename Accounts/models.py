@@ -1,8 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 # Create your models here.
-
+# custom account manager
 class MyAccountManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password=None):
         if not email:
@@ -40,7 +40,7 @@ class MyAccountManager(BaseUserManager):
         return user
 
 # Account model
-class Account(AbstractBaseUser):
+class Account(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=50, verbose_name="First name")
     last_name = models.CharField(max_length=50, verbose_name="Last name")
     username = models.CharField(max_length=50, unique=True, verbose_name="Username")
@@ -48,8 +48,8 @@ class Account(AbstractBaseUser):
     phone_number = models.CharField(max_length=50, unique=True, verbose_name="Phone number")
 
     # required fields
-    date_joined = models.DateTimeField(auto_now_add=True)
-    last_login = models.DateTimeField(auto_now=True)
+    date_joined = models.DateTimeField(auto_now_add=True) # the date the user created the account wont update
+    last_login = models.DateTimeField(auto_now=True)    # the date the user last logged in will update
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -64,8 +64,8 @@ class Account(AbstractBaseUser):
     def __str__(self):
         return self.username
     
-    def has_perm(self, perm, obj=None):
+    def has_perm(self, perm, obj=None): # Uses Django's built-in permission logic
         return self.is_admin
     
-    def has_module_perms(self, add_label):
+    def has_module_perms(self, add_label): # Superusers have all permissions
         return True

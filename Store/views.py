@@ -4,11 +4,12 @@ from .models import Product,Category
 # Create your views here.
 
 def home(request):
-    products = Product.objects.all().filter(is_available=True)[:8]
+    products = Product.objects.filter(is_available=True).order_by('priority')[:8]
     context = {
         'products': products,
     }
     return render(request, 'home.html', context)
+
 
 
 # products page view
@@ -29,10 +30,12 @@ def products(request,category_slug=None): # category_slug is None by default
     }
     return render(request, 'products.html', context)
 
+
+
 # product detail view
 def product_detail(request, category_slug, product_slug):
     try:
-        product = Product.objects.get(category__slug = category_slug, slug = product_slug) # get the product object by category_slug and product_slug
+        product = Product.objects.get(category__slug = category_slug, slug = product_slug) # get the product object by category.slug and product.slug
     except Exception as e:
         raise e
     context = {

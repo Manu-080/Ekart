@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Store',
     'Accounts',
+    'Cart',
 ]
 
 MIDDLEWARE = [
@@ -72,7 +73,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'E_kart.wsgi.application'
 
-AUTH_USER_MODEL = 'Accounts.Account'
+AUTH_USER_MODEL = 'Accounts.Account' # To set the custom user model.
 
 
 # Database

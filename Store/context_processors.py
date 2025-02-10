@@ -3,5 +3,4 @@ from .models import Category
 # They are used to make certain variables globally available in all templates without explicitly passing them in each view.
 
 def category_links(request):
-    links = Category.objects.all()
-    return dict(links = links) # return the links as dictionary
+    return { 'links' : Category.objects.all() } # return the links as dictionary
