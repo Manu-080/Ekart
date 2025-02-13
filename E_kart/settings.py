@@ -66,6 +66,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'Store.context_processors.category_links', # Store = app name, context_processors = file in Store app, category_links = function name.
+                'Store.context_processors.get_quantity', # Store = app name, context_processors = file in Store app, get_quantity = function name.
             ],
         },
     },
