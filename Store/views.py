@@ -1,6 +1,6 @@
 from django.shortcuts import render,get_object_or_404
 from .models import Product,Category,ProductVariation
-from Cart.models import cartItem, Carts
+from Cart.models import cartItem, Cart
 from django.core.paginator import Paginator
 
 from Cart.views import _cart_id
@@ -22,16 +22,16 @@ def products(request,category_slug=None): # category_slug is None by default
     # to get products by category
     if category_slug != None:
         categories = get_object_or_404(Category, slug = category_slug) # get the category object by slug
-        products = Product.objects.filter(category = categories, is_available = True)
+        products   = Product.objects.filter(category = categories, is_available = True)
         product_count = products.count() # count the number of products from above query
     else:
         # if category_slug is None, then display all products
         products = Product.objects.filter(is_available=True)
         product_count = products.count() # count the number of products from above query
 
-    paginator = Paginator(products, 9) # show 8 products per page
+    paginator   = Paginator(products, 9) # show 9 products per page
     page_number = request.GET.get('page') # get the page number from the url
-    page_obj = paginator.get_page(page_number) # get the products for the page number
+    page_obj    = paginator.get_page(page_number) # get the products for the page number
 
     context = {
         #'products' : products,
@@ -46,10 +46,7 @@ def products(request,category_slug=None): # category_slug is None by default
 def product_detail(request, category_slug, product_slug):
     product_variation = []
     if request.POST:
-        for items in request.POST:
-            key = items
-            value = request.POST[key]
-
+        for key, value in request.POST.items():
             try:
                 variations = ProductVariation.objects.get(product = product, variation__iexact = key, variation_value__iexact = value)
                 product_variation.append(variations)
@@ -60,7 +57,7 @@ def product_detail(request, category_slug, product_slug):
     try:
         product = Product.objects.get(category__slug = category_slug, slug = product_slug) # get the product object by category.slug and product.slug
         # to check if the product is already in the users cart.
-        in_cart = cartItem.objects.filter(cart_name = Carts.objects.get(cart_id = _cart_id(request)), product = product).exists() # can also write cart_name__cart_id = _cart_id(request)
+        in_cart = cartItem.objects.filter(cart_name__cart_id = _cart_id(request), product = product).exists() # can also write cart_name__cart_id = _cart_id(request)
         
     except Exception as e:
         raise e

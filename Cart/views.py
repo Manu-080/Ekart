@@ -1,7 +1,6 @@
 from django.shortcuts import render,redirect, get_object_or_404
 from Store.models import Product, ProductVariation # import the Product model
-from .models import Carts, cartItem
-
+from .models import Cart, cartItem
 
 # Create your views here.
 
@@ -10,52 +9,68 @@ def _cart_id(request):
     cart_id = request.session.session_key # get the existing session key
     if not cart:
         cart_id = request.session.create() # create a new session key if it does not exist
-        cart_id = request.session.session_key # get the new session key
     return cart_id
 
 
 def add_to_cart(request,product_slug): # add_to_cart view function
-    product = Product.objects.get(slug = product_slug) # get the product object by slug.
+    # 1. Retrieve the Product
+    product = get_object_or_404(Product, slug = product_slug) # get the product object by slug.
+
+    # 2️. Extract Product Variations (Size, Color, etc.)
     product_variation = []
 
     if request.method == 'POST':
-        for item in request.POST: # for loop to get values from user using POST method.
-            key = item
-            value = request.POST[key]
+        for key, value in request.POST.items(): # for loop to get values from user using POST method.
+            # (key = 'size' or 'variant' or 'color')
+            # value = request.POST[key] | request.POST is a dictionary and returns value coresponding to key.
     
             try:
                 variations = ProductVariation.objects.get(product = product, variation__iexact = key, variation_value__iexact = value)
                 product_variation.append(variations)
-            except:
+            except ProductVariation.DoesNotExist:
                 pass
 
 
-
+    # 3️. get or create cart id.
     try: # if cart_id exists
-        cartid = Carts.objects.get(cart_id = _cart_id(request)) # get the cart object by cart_id
-    except Carts.DoesNotExist: # if cart_id does not exist create a new cart object
-        cartid = Carts.objects.create(cart_id = _cart_id(request)) # create a new cart object
+        cartid = Cart.objects.get(cart_id = _cart_id(request)) # get the cart object by cart_id
+    except Cart.DoesNotExist: # if cart_id does not exist create a new cart object
+        cartid = Cart.objects.create(cart_id = _cart_id(request)) # create a new cart object
         cartid.save() 
 
+    # 4. check if item exists in cart. 
+    cart_items = cartItem.objects.filter(product = product, cart_name = cartid)
+
+    # 5. If the Product Exists, Check Variations.
+    if cart_items.exists() : 
+
+        existing_variation_list = [list(item.variations.all()) for item in cart_items]
+        item_ids = [item.id for item in cart_items]
 
 
-    try: # if item exists in the cart.
-        cart_item = cartItem.objects.get(product = product, cart_name = cartid) # get the cartItem object by product and cart_name
+        if product_variation in existing_variation_list:
 
-        if len(product_variation) > 0:
-            for variation in product_variation:
-                cart_item.variations.add(variation)
+            index = existing_variation_list.index(product_variation)
+            item = cartItem.objects.get(product = product, id = item_ids[index])
+            item.quantity += 1
+            item.save()
 
+        # 6. If the Product Exists but with a Different Variation.
+        else:   
+            
+            item = cartItem.objects.create(product = product, quantity = 1, cart_name = cartid)
+        
 
-        cart_item.quantity += 1 # increment the quantity of the cartItem object by 1
-        cart_item.save() # save the cartItem object
-    except cartItem.DoesNotExist: # if item does not exist in the cart create a new cartItem object.
+            if len(product_variation) > 0:
+                item.variations.add(*product_variation)
+            item.save()
+
+    # 7. If the Product Does Not Exist in the Cart.
+    else:
         cart_item = cartItem.objects.create(product = product, quantity = 1, cart_name = cartid) # create a new cartItem object 
 
         if len(product_variation) > 0:
-            for variation in product_variation:
-                cart_item.variations.add(variation)
-
+            cart_item.variations.add(*product_variation)
         cart_item.save() # save the cartItem object
         
     return redirect('cart') # redirect to the cart page
@@ -63,25 +78,31 @@ def add_to_cart(request,product_slug): # add_to_cart view function
 
 
 """ This should be a javascript function in the cart.html template but i dont know how to do that yet"""
-def remove_cart_item(request, product_slug): # remove_cart_item view function
-    cart = Carts.objects.get(cart_id = _cart_id(request)) 
+def remove_cart_item(request, product_slug, cart_item_id): # remove_cart_item view function
+    cart = Cart.objects.get(cart_id = _cart_id(request)) 
     product = get_object_or_404(Product, slug = product_slug) # get the product object by id
-    cart_item = cartItem.objects.get(product = product, cart_name = cart) # get the cartItem object by product and cart_name
-    
-    cart_item.delete() # delete the cartItem object
+    try:
+        cart_item = cartItem.objects.get(product = product, cart_name = cart, id = cart_item_id) # get the cartItem object by product and cart_name
+        
+        cart_item.delete() # delete the cartItem object
+    except:
+        pass
 
     return redirect('cart') # redirect to the cart page
 
 
 """ This should be a javascript function in the cart.html template but i dont know how to do that yet"""
-def decrement_cart_item(request, product_slug): # decrement_cart_item view function
-    cartid = Carts.objects.get(cart_id = _cart_id(request))
+def decrement_cart_item(request, product_slug, cart_item_id): # decrement_cart_item view function
+    cartid = Cart.objects.get(cart_id = _cart_id(request))
     product = get_object_or_404(Product, slug = product_slug)
-    cart_item = cartItem.objects.get(product = product, cart_name = cartid)
+    try:
+        cart_item = cartItem.objects.get(product = product, cart_name = cartid, id = cart_item_id)
 
-    if cart_item.quantity > 1:
-        cart_item.quantity -= 1
-        cart_item.save()
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+    except:
+        pass
     
     return redirect('cart') # redirect to the cart page
 
@@ -89,7 +110,7 @@ def decrement_cart_item(request, product_slug): # decrement_cart_item view funct
 
 def cart(request, total = 0, cart_items = None): # cart view function
     try:
-        cart = Carts.objects.get(cart_id = _cart_id(request)) # get the cart object by cart_id = session key
+        cart = Cart.objects.get(cart_id = _cart_id(request)) # get the cart object by cart_id = session key
         cart_items = cartItem.objects.filter(cart_name = cart, is_active = True) # get the cartItem objects by cart_name and is_active
 
         for cart_item in cart_items:
@@ -99,8 +120,10 @@ def cart(request, total = 0, cart_items = None): # cart view function
         tax = (4 * total)/100 # calculate the tax
         total_amount = total + tax # calculate the total amount including tax
 
-    except Carts.DoesNotExist:
-        pass # pass the exception if the cart object does not exist
+    except Cart.DoesNotExist:
+       cart_items = []
+       tax = 0
+       total_amount = 0
 
     context = {
         'total': total,

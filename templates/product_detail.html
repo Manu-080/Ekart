@@ -39,9 +39,9 @@
                 {% else %}
                   <h6>Choose Color</h6>
                   <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons" >
-                    {% for i in product.product_variation.colors %} <!-- calling using related_name from Store.models.ProductVariation. (django reverse relationship name)-->
+                    {% for item in product.product_variation.colors %} <!-- calling using related_name from Store.models.ProductVariation. (django reverse relationship name)-->
                     <label class="btn btn-light">
-                      <input type="radio" value="{{i.variation_value}}" name="color" required> {{i.variation_value | capfirst}}
+                      <input type="radio" value="{{item.variation_value}}" name="color" required> {{item.variation_value | capfirst}}
                     </label>
                     {% endfor %}
                   </div> 

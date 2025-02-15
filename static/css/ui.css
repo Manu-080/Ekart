@@ -1411,5 +1411,10 @@ a[class*=card]:hover .title {
   margin-right: 5px;
   display: block;
 }
+/* ================ after added ================== */
+.error {
+  color: red;
+  font-size: 14px;
+}
 
 /*# sourceMappingURL=ui.css.map */

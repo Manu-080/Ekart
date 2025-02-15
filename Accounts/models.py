@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 # Create your models here.
 # custom account manager
 class MyAccountManager(BaseUserManager):
-    def create_user(self, first_name, last_name, username, email, password=None):
+    def create_user(self, first_name, last_name, username, email, phone_number, password=None,):
         if not email:
             raise ValueError ("Users must have an email address")
         
@@ -12,23 +12,25 @@ class MyAccountManager(BaseUserManager):
             raise ValueError ("Users must have a username")
         
         user = self.model(
-            email = self.normalize_email(email),
-            username = username,
-            first_name = first_name,
-            last_name = last_name,
+            email        = self.normalize_email(email),
+            username     = username,
+            first_name   = first_name,
+            last_name    = last_name,
+            phone_number = phone_number
         )
 
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, first_name, last_name, username, email, password=None):
+    def create_superuser(self, first_name, last_name, username, email, phone_number, password=None,):
         user = self.create_user(
-            email = self.normalize_email(email),
-            username = username,
-            first_name = first_name,
-            last_name = last_name,
-            password = password
+            email        = self.normalize_email(email),
+            username     = username,
+            first_name   = first_name,
+            last_name    = last_name,
+            phone_number = phone_number,
+            password     = password
         )
 
         user.is_admin = True
@@ -57,7 +59,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
 
     USERNAME_FIELD = 'email' # the email field will be used as the username field
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name'] # the required fields for creating a user
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'phone_number'] # the required fields for creating a user
 
     objects = MyAccountManager() # connect the MyAccountManager class to the Account model
 
@@ -67,5 +69,5 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def has_perm(self, perm, obj=None): # Uses Django's built-in permission logic
         return self.is_admin
     
-    def has_module_perms(self, add_label): # Superusers have all permissions
+    def has_module_perms(self, app_label): # Superusers have all permissions
         return True
