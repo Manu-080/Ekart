@@ -74,7 +74,7 @@
                         <div class="widget-header">
                             <small class="title text-muted">{{user.username | capfirst}}</small>
                             <div> 
-                                <a href="#">Account</a> <span class="dark-transp"> | </span>
+                                <a href="{% url 'profile' %}">Account</a> <span class="dark-transp"> | </span>
                                 <a href="{% url 'signout' %}"> Log out</a>
                             </div>
                         </div>
